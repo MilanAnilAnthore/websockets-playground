@@ -1,4 +1,12 @@
 const http = require("http");
+
+const express = require("express");
+const app = express();
+
+app.get("/", (req,res)=>{
+    res.sendFile()
+})
+
 const { json } = require("stream/consumers");
 const webSocketServer = require("websocket").server;
 const httpServer = http.createServer();
@@ -19,6 +27,9 @@ wsServer.on("request", request =>{
     connection.on("close", ()=> console.log("Connection closed"));
 
     connection.on("message", message =>{
+
+        const result = JSON.parse(message.utf8Data);
+        console.log(result);
     })
 
     const clientId = crypto.randomUUID();
@@ -33,5 +44,5 @@ wsServer.on("request", request =>{
     }
 
     // Send back client connection
-    connection.send(json.stringify(payload));
+    connection.send(JSON.stringify(payload));
 })
