@@ -8,11 +8,20 @@
 <body>
     <h1>Game</h1>
     <button id="btnCreate">New Game</button>
+    <button id="btnJoin">Join Game</button>
+    <input type="text" id="txtGameId">
+
     <script>
+        let clientId = null;
+        let gameId = null;
         // HTML elements
         const btnCreate = document.getElementById("btnCreate");
+        const btnJoin = document.getElementById("btnJoin");
+        const txtGameId = document.getElementById("txtGameId");
+
 
         // Wiring events
+        //Game Create Event
         btnCreate.addEventListener("click", e=>{
 
             const payLoad = {
@@ -23,7 +32,22 @@
             ws.send(JSON.stringify(payLoad));
         })
 
-        let clientId = null;
+        // Game Join Event
+        btnJoin.addEventListener("click", e=>{
+
+            if(gameId == null){
+               gameId = txtGameId.value;
+            }
+            const payLoad = {
+                "method": "join",
+                "clientId": clientId,
+                "gameId": gameId
+            }
+            
+            ws.send(JSON.stringify(payLoad))
+        })
+
+        //Connecting with server and receiving responses
         let ws = new WebSocket("ws://localhost:9090")
         ws.onmessage = message=>{
             const response = JSON.parse(message.data)
@@ -37,7 +61,7 @@
             // create
             if(response.method === "create"){
                 gameId = response.game.id;
-                gameBalls = response.game.balls;
+                let gameBalls = response.game.balls;
                 console.log(`Game successfully create with id ${gameId} with ${gameBalls} balls`)
             }
         }
