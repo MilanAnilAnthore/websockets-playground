@@ -6,11 +6,40 @@
     <title>Document</title>
 </head>
 <body>
+    <h1>Game</h1>
+    <button id="btnCreate">New Game</button>
     <script>
-        const ws = new WebSocket("ws://localhost:9090")
+        // HTML elements
+        const btnCreate = document.getElementById("btnCreate");
+
+        // Wiring events
+        btnCreate.addEventListener("click", e=>{
+
+            const payLoad = {
+                "method": "create",
+                "clientId": clientId
+            }
+
+            ws.send(JSON.stringify(payLoad));
+        })
+
+        let clientId = null;
+        let ws = new WebSocket("ws://localhost:9090")
         ws.onmessage = message=>{
             const response = JSON.parse(message.data)
-            console.log(response);
+            
+            // connect
+            if(response.method === "connect"){
+                clientId = response.clientId
+                console.log(`client Id is set successfully ${clientId}`);
+            }
+
+            // create
+            if(response.method === "create"){
+                gameId = response.game.id;
+                gameBalls = response.game.balls;
+                console.log(`Game successfully create with id ${gameId} with ${gameBalls} balls`)
+            }
         }
     </script>
 </body>
