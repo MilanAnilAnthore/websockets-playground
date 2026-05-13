@@ -38,19 +38,50 @@ wsServer.on("request", request =>{
         if(result.method === "create"){
             const clientId = result.clientId;
             const gameId = crypto.randomUUID();
-
+            
             games[gameId]={
                 "id": gameId,
-                "balls": 20
+                "balls": 20,
+                "clients": []
             }
 
             const payLoad = {
                 "method": "create",
-                "game": games[gameId]
-            }
+                "game": games[gameId],
+            } 
 
             const con = clients[clientId].connection;
             con.send(JSON.stringify(payLoad))
+        }
+
+        if(result.method == "join"){
+             const clientId = result.clientId;
+             const gameId = result.gameId;
+             console.log(result.gameId)
+
+             const game = games[gameId]
+             if(game.clients.length >= 3){
+                console.log("Max players reached")
+                return
+             }
+             else{
+                const color = {"0": "red", "1": "Green", "2": "Blue"} [game.clients.length]
+                game.clients.push({
+                    "clientId": clientId,
+                    "color": color
+                })
+             }
+
+             const payLoad = {
+                "method": "join",
+                "game": game
+             }
+
+             // Loop through all clients and tell them that people have joined
+            game.clients.forEach(c => {
+                clients[c.clientId].connection.send(JSON.stringify(payLoad))
+            });
+             
         }
     })
 

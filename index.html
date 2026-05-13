@@ -10,6 +10,7 @@
     <button id="btnCreate">New Game</button>
     <button id="btnJoin">Join Game</button>
     <input type="text" id="txtGameId">
+    <div id="divPlayers"></div>
 
     <script>
         let clientId = null;
@@ -18,7 +19,7 @@
         const btnCreate = document.getElementById("btnCreate");
         const btnJoin = document.getElementById("btnJoin");
         const txtGameId = document.getElementById("txtGameId");
-
+        const divPlayers = document.getElementById("divPlayers");
 
         // Wiring events
         //Game Create Event
@@ -63,6 +64,26 @@
                 gameId = response.game.id;
                 let gameBalls = response.game.balls;
                 console.log(`Game successfully create with id ${gameId} with ${gameBalls} balls`)
+            }
+
+            //Join
+            if(response.method === "join"){
+                game = response.game;
+
+                while(divPlayers.firstChild){
+                    divPlayers.removeChild(divPlayers.firstChild)
+                    }
+
+                game.clients.forEach(c => {
+
+                    const d = document.createElement("div");
+                    d.style.width = "200px";
+                    d.style.backgroundColor = c.color
+                    d.textContent = c.clientId;
+
+                    divPlayers.appendChild(d);
+                });
+                
             }
         }
     </script>
