@@ -57,7 +57,6 @@ wsServer.on("request", request =>{
         if(result.method == "join"){
              const clientId = result.clientId;
              const gameId = result.gameId;
-             console.log(result.gameId)
 
              const game = games[gameId]
              if(game.clients.length >= 3){
@@ -72,6 +71,8 @@ wsServer.on("request", request =>{
                 })
              }
 
+             if(game.clients.length === 3) updateGameState();
+
              const payLoad = {
                 "method": "join",
                 "game": game
@@ -82,6 +83,25 @@ wsServer.on("request", request =>{
                 clients[c.clientId].connection.send(JSON.stringify(payLoad))
             });
              
+        }
+
+        // a user plays
+        if(result.method === "play"){
+            const clientId = result.clientId;
+            const gameId = result.gameId;
+            const ballId = result.ballId;
+            const color = result.color;
+            const game = games[gameId]
+            const state = game.state;
+
+            if(!state){
+                state = {};
+            }
+
+            state[ballId] = color;
+            games[gameId] = state;
+
+
         }
     })
 
@@ -99,3 +119,13 @@ wsServer.on("request", request =>{
     // Send back client connection
     connection.send(JSON.stringify(payload));
 })
+
+function updateGameState(){
+    for(const g of games){
+        games[g].clients.forEach(c=>{
+            clients[c.clientId].connection.send(JSON.stringify(games[g]))
+        })
+    }
+
+    setTimeout(updateGameState, 500);
+}
