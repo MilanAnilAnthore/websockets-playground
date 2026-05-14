@@ -75,8 +75,11 @@
             //update
             if (response.method === "update") {
 
-                for (const b of response.game.state) {
-                    const ballId = response.game.state[b];
+                if (!response.game.state) return;
+                for (const b of Object.keys(response.game.state)) {
+                    const color = response.game.state[b];
+                    const ballObject = document.getElementById("ball" + b);
+                    ballObject.style.backgroundColor = color
                 }
             }
 
@@ -105,7 +108,7 @@
 
                 for (let i = 0; i <= game.balls; i++) {
                     const b = document.createElement("button");
-                    b.id = "ball" + i;
+                    b.id = "ball" + (i + 1);
                     b.tag = i + 1
                     b.textContent = i + 1
                     b.style.width = "150px"

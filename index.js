@@ -99,7 +99,7 @@ wsServer.on("request", request => {
             }
 
             state[ballId] = color;
-            games[gameId] = state;
+            games[gameId].state = state;
 
 
         }
@@ -122,7 +122,7 @@ wsServer.on("request", request => {
 
 function updateGameState() {
 
-    for (const g of games) {
+    for (const g of Object.keys(games)) {
         const game = games[g];
         const payLoad = {
             "method": "update",
